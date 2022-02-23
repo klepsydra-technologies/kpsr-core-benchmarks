@@ -4,3 +4,9 @@
 [submodule "thirdparties/googletest"]
         path = thirdparties/googletest
         url = https://github.com/klepsydra-technologies/googletest.git
+[submodule "thirdparties/simdjson"]
+	path = thirdparties/simdjson
+	url = https://github.com/simdjson/simdjson.git
+[submodule "thirdparties/cereal"]
+	path = thirdparties/cereal
+	url = https://github.com/klepsydra-technologies/cereal.git

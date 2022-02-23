@@ -17,25 +17,27 @@
 #
 #****************************************************************************
 
-SET(PROJ_NAME kpsr_benchmark_core_test)
-PROJECT(${PROJ_NAME})
+SET(PROJ_NAME_JSON kpsr_benchmark_json_test)
+PROJECT(${PROJ_NAME_JSON})
 
 # Source
 #---------------------------------------------------#
-FILE(GLOB ${PROJ_NAME}_SRC
+FILE(GLOB ${PROJ_NAME_JSON}_SRC
     "src/*.cpp"
 )
 
 # Create Library
 #---------------------------------------------------#
-ADD_EXECUTABLE(${PROJ_NAME} ${${PROJ_NAME}_HEADERS} ${${PROJ_NAME}_SRC} )
+ADD_EXECUTABLE(${PROJ_NAME_JSON} ${${PROJ_NAME_JSON}_HEADERS} ${${PROJ_NAME_JSON}_SRC} )
 
-TARGET_LINK_LIBRARIES(${PROJ_NAME} PUBLIC kpsr_core benchmark benchmark_main gtest)
+TARGET_LINK_LIBRARIES(${PROJ_NAME_JSON} PUBLIC kpsr_core benchmark benchmark_main gtest simdjson)
 
-TARGET_INCLUDE_DIRECTORIES(${PROJ_NAME}
+TARGET_INCLUDE_DIRECTORIES(${PROJ_NAME_JSON}
     PRIVATE
-    #${CMAKE_SOURCE_DIR}/kpsr-core/core/tests/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${GBENCHMARK_PATH}/include
     ${GBENCHMARK_PATH}/include/benchmark
+    ${CMAKE_SOURCE_DIR}/thirdparties/simdjson/include
+    ${CMAKE_SOURCE_DIR}/thirdparties/cereal/include
     )
 
