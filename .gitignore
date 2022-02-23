@@ -1,7 +1,6 @@
 build/**
 **/build
 **/thirdparties/include
-**/thirdparties/googletest
 build_ros/**
 **/build_ros
 **/kpsr_codegen.egg-info
