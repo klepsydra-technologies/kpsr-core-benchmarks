@@ -21,4 +21,5 @@ venv
 **/gen
 dist
 kpsr_codegen.egg-info
-
+cereal_json_str.txt*
+**/cereal_json_str.txt*

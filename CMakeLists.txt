@@ -34,7 +34,7 @@ set(BENCHMARK_VERSION
 
 # Configuration types
 # ------------------------------------------------------------------------------------------------------
-SET(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configs" FORCE)
+SET(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "Configs" FORCE)
 IF(DEFINED CMAKE_BUILD_TYPE AND CMAKE_VERSION VERSION_GREATER "2.8")
   SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES})
 ENDIF()
@@ -42,6 +42,8 @@ ENDIF()
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
+
+enable_testing()
 
 # Configure variables
 # ------------------------------------------------------------------------------------------------------
@@ -69,19 +71,17 @@ ELSE()
 ENDIF()
 message(STATUS "cereal_DIR path: " ${cereal_DIR})
 
-OPTION(DEFINE_SAVE_FLOATS_TO_TEST_FILE "To save output json test file to disk." OFF) # Disabled by default
-IF(DEFINE_SAVE_FLOATS_TO_TEST_FILE)
-  ADD_DEFINITIONS(-DSAVE_FLOATS_TO_TEST_FILE)
-ENDIF(DEFINE_SAVE_FLOATS_TO_TEST_FILE)
-message(STATUS "DEFINE_SAVE_FLOATS_TO_TEST_FILE: " ${DEFINE_SAVE_FLOATS_TO_TEST_FILE})
-
-IF(DEFINED TEST_FILE_PATH_AND_NAME)
-  ADD_DEFINITIONS(-DTEST_FILE_PATH_AND_NAME="\""${TEST_FILE_PATH_AND_NAME}"\"")
+IF(DEFINED PODS_PATH)
 ELSE()
-  ADD_DEFINITIONS(-DTEST_FILE_PATH_AND_NAME="out.txt")
-  SET(TEST_FILE_PATH_AND_NAME out.txt)
+  SET(PODS_PATH ${CMAKE_SOURCE_DIR}/thirdparties/pods)
 ENDIF()
-message(STATUS "TEST_FILE_PATH_AND_NAME: " ${TEST_FILE_PATH_AND_NAME})
+message(STATUS "pods path: " ${PODS_PATH})
+
+IF(DEFINED YAS_PATH)
+ELSE()
+  SET(YAS_PATH ${CMAKE_SOURCE_DIR}/thirdparties/yas)
+ENDIF()
+message(STATUS "yas path: " ${YAS_PATH})
 
 IF(DEFINED JSON_FILE_PATH_AND_NAME)
   ADD_DEFINITIONS(-DJSON_FILE_PATH_AND_NAME="\""${JSON_FILE_PATH_AND_NAME}"\"")
@@ -91,6 +91,29 @@ ELSE()
 ENDIF()
 message(STATUS "JSON_FILE_PATH_AND_NAME: " ${JSON_FILE_PATH_AND_NAME})
 
+IF(DEFINED BM_DENSE_RANGE_START)
+  ADD_DEFINITIONS(-DBM_DENSE_RANGE_START=${BM_DENSE_RANGE_START})
+ELSE()
+  ADD_DEFINITIONS(-DBM_DENSE_RANGE_START=1024)
+  SET(BM_DENSE_RANGE_START 1024)
+ENDIF()
+message(STATUS "BM_DENSE_RANGE_START: " ${BM_DENSE_RANGE_START})
+
+IF(DEFINED BM_DENSE_RANGE_END)
+  ADD_DEFINITIONS(-DBM_DENSE_RANGE_END=${BM_DENSE_RANGE_END})
+ELSE()
+  ADD_DEFINITIONS(-DBM_DENSE_RANGE_END=102400)
+  SET(BM_DENSE_RANGE_END 102400)
+ENDIF()
+message(STATUS "BM_DENSE_RANGE_END: " ${BM_DENSE_RANGE_END})
+
+IF(DEFINED BM_DENSE_RANGE_INCR)
+  ADD_DEFINITIONS(-DBM_DENSE_RANGE_INCR=${BM_DENSE_RANGE_INCR})
+ELSE()
+  ADD_DEFINITIONS(-DBM_DENSE_RANGE_INCR=1024)
+  SET(BM_DENSE_RANGE_INCR 1024)
+ENDIF()
+message(STATUS "BM_DENSE_RANGE_INCR: " ${BM_DENSE_RANGE_INCR})
 
 # Required packages.
 # ------------------------------------------------------------------------------------------------------
@@ -98,8 +121,8 @@ find_package(Klepsydra REQUIRED)
 
 # Ouput paths.
 # ------------------------------------------------------------------------------------------------------
-SET(LIBRARY_OUTPUT_PATH          ${PROJECT_BINARY_DIR}/bin                   CACHE PATH "Library output" FORCE)
-SET(EXECUTABLE_OUTPUT_PATH       ${PROJECT_BINARY_DIR}/bin                   CACHE PATH "Executable output" FORCE)
+SET(LIBRARY_OUTPUT_PATH          ${PROJECT_BINARY_DIR}/bin         CACHE PATH "Library output" FORCE)
+SET(EXECUTABLE_OUTPUT_PATH       ${PROJECT_BINARY_DIR}/bin         CACHE PATH "Executable output" FORCE)
 
 ######################################################################################
 # ADD SUB FOLDERS
@@ -109,3 +132,4 @@ ADD_SUBDIRECTORY(${GOOGLETEST_PATH})
 ADD_SUBDIRECTORY(${GBENCHMARK_PATH})
 set_target_properties(cxx03_test PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
 ADD_SUBDIRECTORY(${SIMDJSON_PATH})
+ADD_SUBDIRECTORY(${PODS_PATH})

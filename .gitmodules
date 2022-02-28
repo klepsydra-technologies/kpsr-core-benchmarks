@@ -10,3 +10,9 @@
 [submodule "thirdparties/cereal"]
 	path = thirdparties/cereal
 	url = https://github.com/klepsydra-technologies/cereal.git
+[submodule "thirdparties/pods"]
+	path = thirdparties/pods
+	url = https://github.com/mtrempoltsev/pods.git
+[submodule "thirdparties/yas"]
+	path = thirdparties/yas
+	url = https://github.com/niXman/yas.git

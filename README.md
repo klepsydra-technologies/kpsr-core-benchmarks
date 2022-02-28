@@ -15,14 +15,15 @@
 
 * Google Benchmark (<https://github.com/google/benchmark.git>)
 * Google Test (<https://github.com/klepsydra-technologies/googletest>)
-* Cereal (<https://github.com/klepsydra-technologies/cereal>)
 * Simdjson (<https://github.com/simdjson/simdjson.git>)
+* Cereal (<https://github.com/klepsydra-technologies/cereal>)
+* Pods (<https://github.com/mtrempoltsev/pods.git>)
+* Yas (<https://github.com/niXman/yas.git>)
 
 ## Related docs
 
 * [Tool Preparation](./analysis/TOOL_PREPARATION.md)
 * [Tool Execution](./analysis/TOOL_EXECUTION.md)
-* [Results output file bm.out](./analysis/bm.out)
 
 ## System requirements
 
@@ -41,7 +42,7 @@ Given ```$KLEPSYDRA_HOME```, for example ```$HOME/klepsydra```:
 cd $KLEPSYDRA_HOME
 git clone https://github.com/klepsydra-technologies/kpsr-core-benchmarks.git
 cd kpsr-core-benchmarks
-git submodule update --init
+git submodule update --init --recursive
 mkdir build
 cd build
 cmake .. -DCMAKE_PREFIX_PATH="/home/user/klepsydra/community/install" -DCMAKE_INSTALL_PREFIX="/home/user/klepsydra/community/install"
@@ -67,13 +68,21 @@ The cmake has the following featured options:
 * -DGOOGLETEST_PATH: if new path not specified, thirdparties/googletest will be used.
 * -DCMAKE_PREFIX_PATH for specifying where to look up for installed dependencies as current Klepsydra installation location (/usr/local by default)
 * -DCMAKE_INSTALL_PREFIX to specify where to install binaries, if **make install** executed.
-* -DDEFINE_SAVE_FLOATS_TO_TEST_FILE by default is set to OFF. Set to =ON if you need to see how Cereal serialize json test file to disk. Ouput file should be set using absolute path using directive variable DTEST_FILE_PATH_AND_NAME. If not specified, default **out.txt** will be created in exection folder (/build if used to execute as example below **./bin/kpsr_benchmark_json_test**)
-* -DTEST_FILE_PATH_AND_NAME used to specify json test ouput file to check format used by Cereal to serialize to json.
+**out.txt** will be created in exection folder (/build if used to execute as example below **./bin/kpsr_benchmark_json_test**)
 * -DJSON_FILE_PATH_AND_NAME used to specify json output files created sequentialy by Cereal TCs when generate random std::vector< float > which will be used to generate the json files used as initial conditions of each benchamrk test. For each size of the vector benchmarked, will be generated a json initial file using this prefix and adding at the end the size number of the vector benchmarked. 
+* -DBM_DENSE_RANGE_START benchmarks uses DenseRange for vectorSize from START to END with INCR. If _START not specified 1024 will be used.
+* -DBM_DENSE_RANGE_END benchmarks uses DenseRange for vectorSize from START to END with INCR. If _END not specified 102400 will be used. 
+* -DBM_DENSE_RANGE_INCR benchmarks uses DenseRange for vectorSize from START to END with INCR. If _INCR not specified 1024 will be used.  
+
 Example
 
 ```bash
-cmake .. -DCMAKE_PREFIX_PATH="/home/jose/klepsydra/klepsydra/development/community/install" -DCMAKE_INSTALL_PREFIX="/home/jose/klepsydra/klepsydra/development/community/install" -DDEFINE_SAVE_FLOATS_TO_TEST_FILE=ON 
+cmake .. 
+-DCMAKE_PREFIX_PATH="/home/jose/klepsydra/klepsydra/development/community/install" 
+-DCMAKE_INSTALL_PREFIX="/home/jose/klepsydra/klepsydra/development/community/install" 
+-DBM_DENSE_RANGE_START=1024 
+-DBM_DENSE_RANGE_END=102400 
+-DBM_DENSE_RANGE_INCR=9216
 ```
 
 ## Google Benchmak support
@@ -81,16 +90,16 @@ cmake .. -DCMAKE_PREFIX_PATH="/home/jose/klepsydra/klepsydra/development/communi
 Test case target project cxx03_test is not supported by kpsr-core thus, will be not compiled.
 
 To use UserCounters column-tabbed please, use the command line argument **--benchmark_counters_tabular=true** after the test executable.
+To specify output file needed to be used with compare.py script tool, please use the command line argument **--benchmark_out=bm.out**.
 
 ```bash
-user@ubuntu:~/kpsr-core-benchmarks/build$ ./bin/kpsr_benchmark_core_test --benchmark_counters_tabular=true
+user@ubuntu:~/kpsr-core-benchmarks/build$ ./bin/kpsr_benchmark_core_test --benchmark_counters_tabular=true --benchmark_out=bm.out
 ```
 
-## Cereal & SimdJSON support
+## Cereal & SimdJSON & Pods & Yas support
 
-Test cases has been designed to check how benchmark differs when serializing same json input stream of std::vector<float> using both, Cereal and SimdJSON serializers. 
+Test cases has been designed to check how benchmark differs when serializing same json input stream of std::vector<float> using all of them, Cereal, SimdJSON, Pods and Yas serializers. 
 
-You can execute the TCs using below execute command. Remeber you can use directive variables **DDEFINE_SAVE_FLOATS_TO_TEST_FILE=ON[OFF]** and **DTEST_FILE_PATH_AND_NAME="<path_and_filename>"** when building cmake.  
 
 ```bash
 user@ubuntu:~/kpsr-core-benchmarks/build$ ./bin/kpsr_benchmark_json_test --benchmark_counters_tabular=true
@@ -102,6 +111,8 @@ These benchmark TCs has been designed to be executed sequentialy. First, Cereal 
 
 In the first step of creating these json files as initial conditions, plays a key role the benchmark parameter about size of vector to be benchmrked. Test uses a **->DenseRange(1024, 102400, 1<<10)** as vector size. This means one test json file is created to disk for each size, using as name, the concatenation of filepath provided by JSON_FILE_PATH_AND_NAME and vector size at the end of the string.
 
+Default values for DenseRange are **->DenseRange(1024, 102400, 1024)**. If these values do not fit your needs, you can use featured cmake variables **-DBM_DENSE_RANGE_START, --DBM_DENSE_RANGE_END & D--BM_DENSE_RANGE_INCR**.
+
 Example: 
 
 If we cmake as below:
@@ -110,9 +121,10 @@ If we cmake as below:
 cmake .. 
 -DCMAKE_PREFIX_PATH="/home/jose/klepsydra/klepsydra/development/community/install"
 -DCMAKE_INSTALL_PREFIX="/home/jose/klepsydra/klepsydra/development/community/install" 
--DDEFINE_SAVE_FLOATS_TO_TEST_FILE=ON 
--DTEST_FILE_PATH_AND_NAME="/home/jose/klepsydra/klepsydra/development/community/kpsr-core-benchmarks/build/my_out_cereal.txt"
 -DJSON_FILE_PATH_AND_NAME="/home/jose/klepsydra/klepsydra/development/community/kpsr-core-benchmarks/build/my_cereal_json_str.txt"
+-DBM_DENSE_RANGE_START=1024 
+-DBM_DENSE_RANGE_END=102400 
+-DBM_DENSE_RANGE_INCR=9216
 ```
 
 When **kpsr_benchmark_core_test** test is executed, a set of files will be created for each size of the vector as below:
@@ -144,36 +156,45 @@ As is shown, ***my_cereal_json_str.txt*****1024** file is the concatenation of t
 
 **NOTE**: If DJSON_FILE_PATH_AND_NAME is not specified, default **cereal_json_str.txt** filename will be used.
 
-The **my_out_cereal.txt** file is not needed by TCs. Its only used for debugging purposes to show how Cereal ouputs json vector of floats.
+**NOTE**: bytes_per_second Counter is calculated as in google benchmark examples but for float size. See below. For binary serialization has not been considered the real serialized size stream. Has been considered the total bytes in floats into the std::vector< float > array to calulate the bytes processed. Its a messure of our real worth processed and not the real binary stream processed. 
 
 ```bash
-user@ubuntu:~/klepsydra/klepsydra/development/community/kpsr-core-benchmarks/build$ ./bin/kpsr_benchmark_json_test --benchmark_counters_tabular=true
-2022-02-26T00:13:44+01:00
+state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(retrievedVectorSize * sizeof(float)));
+```
+
+
+```bash
+jose@ubuntu:~/klepsydra/klepsydra/development/kpsr-core-benchmarks_pushed/build$ ./bin/kpsr_benchmark_json_test --benchmark_counters_tabular=true --benchmark_out=bm.out
+2022-03-05T20:46:07+01:00
 Running ./bin/kpsr_benchmark_json_test
-Run on (16 X 3800 MHz CPU s)
+Run on (32 X 2394.01 MHz CPU s)
 CPU Caches:
-  L1 Data 32 KiB (x16)
-  L1 Instruction 32 KiB (x16)
-  L2 Unified 512 KiB (x16)
-  L3 Unified 16384 KiB (x1)
-Load Average: 0.99, 0.86, 0.69
------------------------------------------------------------------------------------------------
-Benchmark                                    Time       CPU        Iterations retrievedVectorSz
------------------------------------------------------------------------------------------------
-Cereal__Retrive_float_vector/1024/real_time   219700 ns  219522 ns 3159          1024
-Cereal__Retrive_float_vector/2048/real_time   443492 ns  443138 ns 1588        2.048k
-Cereal__Retrive_float_vector/3072/real_time   659648 ns  657620 ns 1058        3.072k
-Cereal__Retrive_float_vector/4096/real_time   880931 ns  879935 ns  794        4.096k
-Cereal__Retrive_float_vector/5120/real_time  1102488 ns 1101694 ns  638         5.12k
-Cereal__Retrive_float_vector/6144/real_time  1623337 ns 1622293 ns  433        6.144k
-Cereal__Retrive_float_vector/7168/real_time  1567311 ns 1567268 ns  454        7.168k
-Cereal__Retrive_float_vector/8192/real_time  1810505 ns 1808814 ns  388        8.192k
-Cereal__Retrive_float_vector/9216/real_time  2023501 ns 2020727 ns  350        9.216k
-Cereal__Retrive_float_vector/10240/real_time 2215584 ns 2215528 ns  319        10.24k
-Cereal__Retrive_float_vector/11264/real_time 2431164 ns 2431098 ns  288       11.264k
-Cereal__Retrive_float_vector/12288/real_time 2662929 ns 2662924 ns  266       12.288k
-Cereal__Retrive_float_vector/13312/real_time 2908597 ns 2905893 ns  245       13.312k
-Cereal__Retrive_float_vector/14336/real_time 3161732 ns 3154675 ns  219       14.336k
+  L1 Data 32 KiB (x32)
+  L1 Instruction 32 KiB (x32)
+  L2 Unified 1024 KiB (x32)
+  L3 Unified 36608 KiB (x2)
+Load Average: 3.61, 1.66, 0.93
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+Benchmark                                                                            Time             CPU   Iterations bytes_per_second retrievedVectorSz
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+BmCereal::DeserializeJsonStringToVector/1024/real_time                          321860 ns       321694 ns         2435       12.1365M/s              1024
+BmCereal::DeserializeJsonStringToVector/10240/real_time                        3510287 ns      3509987 ns          178        11.128M/s            10.24k
+BmCereal::DeserializeJsonStringToVector/19456/real_time                        6099882 ns      6095299 ns          130       12.1672M/s           19.456k
+BmCereal::DeserializeJsonStringToVector/28672/real_time                        7614730 ns      7614214 ns           72       14.3636M/s           28.672k
+BmCereal::DeserializeJsonStringToVector/37888/real_time                       10447849 ns     10445162 ns           71       13.8336M/s           37.888k
+BmCereal::DeserializeJsonStringToVector/47104/real_time                       12775893 ns     12774863 ns           54       14.0646M/s           47.104k
+BmCereal::DeserializeJsonStringToVector/56320/real_time                       15435543 ns     15429253 ns           40       13.9188M/s            56.32k
+BmCereal::DeserializeJsonStringToVector/65536/real_time                       19141684 ns     19135720 ns           40       13.0605M/s           65.536k
+BmCereal::DeserializeJsonStringToVector/74752/real_time                       20037854 ns     20036301 ns           36       14.2309M/s           74.752k
+BmCereal::DeserializeJsonStringToVector/83968/real_time                       23834237 ns     23827495 ns           29       13.4392M/s           83.968k
+BmCereal::DeserializeJsonStringToVector/93184/real_time                       24152091 ns     24145572 ns           29       14.7179M/s           93.184k
+BmCereal::DeserializeJsonStringToVector/102400/real_time                      27091990 ns     27089524 ns           24       14.4185M/s            102.4k
+BmCereal::DeserializeJsonFileToVector/1024/real_time                            303621 ns       303602 ns         2340       12.8655M/s              1024
+BmCereal::DeserializeJsonFileToVector/10240/real_time                          3070668 ns      3070369 ns          244       12.7212M/s            10.24k
+BmCereal::DeserializeJsonFileToVector/19456/real_time                          5616963 ns      5616886 ns           94       13.2133M/s           19.456k
+BmCereal::DeserializeJsonFileToVector/28672/real_time                          9050409 ns      9049556 ns           81       12.0851M/s           28.672k
+BmCereal::DeserializeJsonFileToVector/37888/real_time                         11363902 ns     11362466 ns           62       12.7185M/s           37.888k
+
 ...
 ...
 

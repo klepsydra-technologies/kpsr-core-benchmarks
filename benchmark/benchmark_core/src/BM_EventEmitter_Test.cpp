@@ -23,7 +23,6 @@
 
 static void BM_EventEmitter_Test(benchmark::State &state)
 {
-    // Perform setup here
     const int poolSize = state.range(0);
     const int vectorSize(state.range(1));
     const bool initialize = state.range(2);
@@ -48,12 +47,12 @@ static void BM_EventEmitter_Test(benchmark::State &state)
         [&published_count](const std::vector<float> & event) { 
             published_count++;
         });
-    // This code gets timed
+
     for (auto _ : state) {
         vectorProvider.getPublisher()->publish(vf_vec);
         
     }
-    // end timed code.
+     
     vectorProvider.getSubscriber()->removeListener("vector listener");
 
     state.counters["poolSz"] = poolSize;
