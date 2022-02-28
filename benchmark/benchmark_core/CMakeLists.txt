@@ -34,7 +34,6 @@ TARGET_LINK_LIBRARIES(${PROJ_NAME} PUBLIC kpsr_core benchmark benchmark_main gte
 
 TARGET_INCLUDE_DIRECTORIES(${PROJ_NAME}
     PRIVATE
-    #${CMAKE_SOURCE_DIR}/kpsr-core/core/tests/common
     ${GBENCHMARK_PATH}/include
     ${GBENCHMARK_PATH}/include/benchmark
     )
