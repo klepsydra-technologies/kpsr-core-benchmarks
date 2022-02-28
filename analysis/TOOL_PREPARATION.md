@@ -12,7 +12,6 @@
 
 * [Main Readme](./../README.md)
 * [Tool Execution](./TOOL_EXECUTION.md)
-* [Results output file bm.out](./bm.out)
 
 ## System dependencies
 
