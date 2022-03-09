@@ -37,22 +37,22 @@ static void BM_EventEmitter_Test(benchmark::State &state)
     } else {
         fx_initializerFunction = nullptr;
     }
-    
+
     kpsr::EventEmitterMiddlewareProvider<std::vector<float>> vectorProvider(nullptr,
                                                                             "vector_provider",
                                                                             poolSize,
                                                                             fx_initializerFunction,
                                                                             nullptr);
     vectorProvider.getSubscriber()->registerListener("vector listener",
-        [&published_count](const std::vector<float> & event) { 
-            published_count++;
-        });
+                                                     [&published_count](
+                                                         const std::vector<float> &event) {
+                                                         published_count++;
+                                                     });
 
     for (auto _ : state) {
         vectorProvider.getPublisher()->publish(vf_vec);
-        
     }
-     
+
     vectorProvider.getSubscriber()->removeListener("vector listener");
 
     state.counters["poolSz"] = poolSize;
@@ -63,9 +63,6 @@ static void BM_EventEmitter_Test(benchmark::State &state)
 
 BENCHMARK(BM_EventEmitter_Test)
     ->UseRealTime()
-    ->ArgsProduct({
-        {0, 16, 32, 64},
-        benchmark::CreateDenseRange(0, 2048, 1<<9),
-        {true, false}});
+    ->ArgsProduct({{0, 16, 32, 64}, benchmark::CreateDenseRange(0, 2048, 1 << 9), {true, false}});
 
 BENCHMARK_MAIN();

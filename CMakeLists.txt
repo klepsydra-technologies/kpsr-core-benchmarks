@@ -47,6 +47,22 @@ enable_testing()
 
 # Configure variables
 # ------------------------------------------------------------------------------------------------------
+
+# Paths
+if(DEFINED KPSR_BUILD_PATH)
+else()
+    SET(KPSR_BUILD_PATH ${CMAKE_SOURCE_DIR}/kpsr-build)
+endif()
+message(STATUS "kpsr-build path: " ${KPSR_BUILD_PATH})
+
+IF(DEFINED THIRDPARTIES_PATH)
+ELSE()
+  SET(THIRDPARTIES_PATH ${CMAKE_SOURCE_DIR}/thirdparties )
+ENDIF()
+message(STATUS "Thirdparties install path: " ${THIRDPARTIES_PATH})
+
+SET(CMAKE_MODULE_PATH            ${KPSR_BUILD_PATH}/cmake)
+
 IF(DEFINED GBENCHMARK_PATH)
 ELSE()
   SET(GBENCHMARK_PATH ${CMAKE_SOURCE_DIR}/thirdparties/benchmark)
@@ -130,6 +146,40 @@ SET(EXECUTABLE_OUTPUT_PATH       ${PROJECT_BINARY_DIR}/bin         CACHE PATH "E
 ADD_SUBDIRECTORY(benchmark)
 ADD_SUBDIRECTORY(${GOOGLETEST_PATH})
 ADD_SUBDIRECTORY(${GBENCHMARK_PATH})
-set_target_properties(cxx03_test PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
+#set_target_properties(cxx03_test PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)
 ADD_SUBDIRECTORY(${SIMDJSON_PATH})
 ADD_SUBDIRECTORY(${PODS_PATH})
+
+######################################################################################
+# CODE STYLE
+######################################################################################
+if (KPSR_WITH_CODE_METRICS)
+  include(CodeCoverage)
+  set(CODE_COVERAGE_VERBOSE ON)
+  APPEND_COVERAGE_COMPILER_FLAGS()
+   # Code style check
+   include(CppcheckTargets)
+   include(Findcppcheck)
+ENDIF()
+
+# Code format check
+include(CodeFormat)
+
+# Code Coverage
+if (KPSR_WITH_CODE_METRICS AND CMAKE_BUILD_TYPE MATCHES Debug AND CMAKE_COMPILER_IS_GNUCXX)
+  STRING(REPLACE ${CMAKE_SOURCE_DIR}/ "" THIRDPARTIES_PATH_COVERAGE ${THIRDPARTIES_PATH})
+  LIST(APPEND COVERAGE_EXCLUDES
+    ${THIRDPARTIES_PATH_COVERAGE}
+    ${CMAKE_PREFIX_PATH}
+    benchmark/benchmark_json/tests
+    )
+  setup_target_for_coverage_gcovr_xml(
+    NAME coverage
+    EXECUTABLE make test
+    )
+ENDIF()
+
+######################################################################################
+# CCACHE SUPPORT
+######################################################################################
+include(FindCcache)

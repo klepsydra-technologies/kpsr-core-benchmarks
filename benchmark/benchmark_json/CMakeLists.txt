@@ -27,7 +27,7 @@ FILE(GLOB ${PROJ_NAME_JSON}_HEADERS
     "include/Bm*.h"
 )
 FILE(GLOB ${PROJ_NAME_TEST}_SRC
-    "gtest/*.cpp"
+    "tests/*.cpp"
 )
 
 # Create Library
