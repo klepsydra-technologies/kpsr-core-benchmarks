@@ -2,6 +2,7 @@
   <img width="25%" height="25%"src="./images/klepsydra_logo.jpg">
 </p>
 
+[![Check build](https://github.com/klepsydra-technologies/kpsr-core-benchmarks/actions/workflows/push.yml/badge.svg?branch=main)](https://github.com/klepsydra-technologies/kpsr-core-benchmarks/actions/workflows/push.yml) [![Code style check](https://github.com/klepsydra-technologies/kpsr-core-benchmarks/actions/workflows/prcodecheck.yml/badge.svg?branch=main)](https://github.com/klepsydra-technologies/kpsr-core-benchmarks/actions/workflows/prcodecheck.yml) [![codecov](https://codecov.io/gh/klepsydra-technologies/kpsr-core-benchmarks/branch/main/graph/badge.svg?token=PDALQNPJRD)](https://codecov.io/gh/klepsydra-technologies/kpsr-core-benchmarks)
 # Installation Instructions
 
 ## System dependencies
@@ -69,7 +70,7 @@ The cmake has the following featured options:
 * -DCMAKE_PREFIX_PATH for specifying where to look up for installed dependencies as current Klepsydra installation location (/usr/local by default)
 * -DCMAKE_INSTALL_PREFIX to specify where to install binaries, if **make install** executed.
 **out.txt** will be created in exection folder (/build if used to execute as example below **./bin/kpsr_benchmark_json_test**)
-* -DJSON_FILE_PATH_AND_NAME used to specify json output files created sequentialy by Cereal TCs when generate random std::vector< float > which will be used to generate the json files used as initial conditions of each benchamrk test. For each size of the vector benchmarked, will be generated a json initial file using this prefix and adding at the end the size number of the vector benchmarked. 
+* -DJSON_FILE_PATH_AND_NAME used to specify json output files created sequentialy by Cereal TCs when generate random std::vector< float > which will be used to generate the json files used as initial conditions of each benchamrk test. For each size of the vector benchmarked, will be generated a json initial file using this prefix and adding at the end the size number of the vector benchmarked.
 * -DBM_DENSE_RANGE_START benchmarks uses DenseRange for vectorSize from START to END with INCR. If _START not specified 1024 will be used.
 * -DBM_DENSE_RANGE_END benchmarks uses DenseRange for vectorSize from START to END with INCR. If _END not specified 102400 will be used. 
 * -DBM_DENSE_RANGE_INCR benchmarks uses DenseRange for vectorSize from START to END with INCR. If _INCR not specified 1024 will be used.  
@@ -98,8 +99,7 @@ user@ubuntu:~/kpsr-core-benchmarks/build$ ./bin/kpsr_benchmark_core_test --bench
 
 ## Cereal & SimdJSON & Pods & Yas support
 
-Test cases has been designed to check how benchmark differs when serializing same json input stream of std::vector<float> using all of them, Cereal, SimdJSON, Pods and Yas serializers. 
-
+Test cases has been designed to check how benchmark differs when serializing same json input stream of `std::vector<float>` using all of them, Cereal, SimdJSON, Pods and Yas serializers.
 
 ```bash
 user@ubuntu:~/kpsr-core-benchmarks/build$ ./bin/kpsr_benchmark_json_test --benchmark_counters_tabular=true
@@ -113,7 +113,7 @@ In the first step of creating these json files as initial conditions, plays a ke
 
 Default values for DenseRange are **->DenseRange(1024, 102400, 1024)**. If these values do not fit your needs, you can use featured cmake variables **-DBM_DENSE_RANGE_START, --DBM_DENSE_RANGE_END & D--BM_DENSE_RANGE_INCR**.
 
-Example: 
+Example:
 
 If we cmake as below:
 
@@ -152,7 +152,8 @@ drwxrwxr-x 2 jose jose    4096 Feb 26 00:12 lib/
 -rw-rw-r-- 1 jose jose 3123179 Feb 26 00:19 my_out_cereal.txt
 drwxrwxr-x 5 jose jose    4096 Feb 26 00:08 thirdparties/
 ```
-As is shown, ***my_cereal_json_str.txt*****1024** file is the concatenation of the filename set through ***DJSON_FILE_PATH_AND_NAME*** and **vector size** for this benchmark test. 
+
+As is shown, ***my_cereal_json_str.txt*****1024** file is the concatenation of the filename set through ***DJSON_FILE_PATH_AND_NAME*** and **vector size** for this benchmark test.
 
 **NOTE**: If DJSON_FILE_PATH_AND_NAME is not specified, default **cereal_json_str.txt** filename will be used.
 
@@ -161,7 +162,6 @@ As is shown, ***my_cereal_json_str.txt*****1024** file is the concatenation of t
 ```bash
 state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(retrievedVectorSize * sizeof(float)));
 ```
-
 
 ```bash
 jose@ubuntu:~/klepsydra/klepsydra/development/kpsr-core-benchmarks_pushed/build$ ./bin/kpsr_benchmark_json_test --benchmark_counters_tabular=true --benchmark_out=bm.out
@@ -206,7 +206,6 @@ Please, visit provided info about how to use Google Benchmark compare.py script 
 
 * [Tool Preparation](./analysis/TOOL_PREPARATION.md)
 * [Tool Execution](./analysis/TOOL_EXECUTION.md)
-
 
 # License
 

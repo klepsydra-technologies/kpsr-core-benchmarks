@@ -4,28 +4,32 @@
 #pragma once
 #include <SerializationBenchmarkUtils.h>
 #include <VectorFloatStruct.h>
-#include <iostream>
-#include <fstream>
+#include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
 #include <cereal/types/vector.hpp>
-#include <cereal/archives/binary.hpp>
+#include <fstream>
+#include <iostream>
 
-
-
-struct VectorFloatStruct4Cereal : public VectorFloatStruct {
-    VectorFloatStruct4Cereal() : VectorFloatStruct() {};
-    VectorFloatStruct4Cereal(long l_size_vec) : VectorFloatStruct(l_size_vec) {};
-    VectorFloatStruct4Cereal(long l_size_vec, float initFloatValue) : VectorFloatStruct(l_size_vec, initFloatValue) {};
+struct VectorFloatStruct4Cereal : public VectorFloatStruct
+{
+    VectorFloatStruct4Cereal()
+        : VectorFloatStruct(){};
+    VectorFloatStruct4Cereal(long l_size_vec)
+        : VectorFloatStruct(l_size_vec){};
+    VectorFloatStruct4Cereal(long l_size_vec, float initFloatValue)
+        : VectorFloatStruct(l_size_vec, initFloatValue){};
 
     friend class cereal::access;
 
     template<class Archive>
-    void serialize(Archive & archive) {
-        archive( cereal::make_nvp("vector" , _vec_f) );
+    void serialize(Archive &archive)
+    {
+        archive(cereal::make_nvp("vector", _vec_f));
     }
-    
-    void serializeVectorToJsonFile(const std::string & filename_string){
+
+    void serializeVectorToJsonFile(const std::string &filename_string)
+    {
         std::ofstream os(filename_string);
         {
             cereal::JSONOutputArchive archive_out(os);
@@ -34,7 +38,8 @@ struct VectorFloatStruct4Cereal : public VectorFloatStruct {
         return;
     }
 
-    std::string serializeVectorToJson(){
+    std::string serializeVectorToJson()
+    {
         std::stringstream os;
         {
             cereal::JSONOutputArchive archive_out(os);
@@ -42,8 +47,9 @@ struct VectorFloatStruct4Cereal : public VectorFloatStruct {
         }
         return os.str();
     }
-    
-    void serializeVectorToBinaryFile(const std::string & filename_string){
+
+    void serializeVectorToBinaryFile(const std::string &filename_string)
+    {
         std::ofstream os(filename_string, std::ios::binary);
         {
             cereal::BinaryOutputArchive archive_out(os);
@@ -52,7 +58,8 @@ struct VectorFloatStruct4Cereal : public VectorFloatStruct {
         return;
     }
 
-    std::string serializeVectorToBinaryString(){
+    std::string serializeVectorToBinaryString()
+    {
         std::stringstream ss;
         {
             cereal::BinaryOutputArchive archive_out(ss);
@@ -61,7 +68,7 @@ struct VectorFloatStruct4Cereal : public VectorFloatStruct {
         return ss.str();
     }
 
-    void serializeVectorToBinaryStream(std::stringstream & ss)
+    void serializeVectorToBinaryStream(std::stringstream &ss)
     {
         std::stringstream is;
         {
@@ -71,18 +78,18 @@ struct VectorFloatStruct4Cereal : public VectorFloatStruct {
         ss << is.rdbuf();
     }
 
-
-    
-    std::vector<float> deserializeJsonToVector(const std::string & json_string){
-        std::stringstream is (json_string);
+    std::vector<float> deserializeJsonToVector(const std::string &json_string)
+    {
+        std::stringstream is(json_string);
         {
             cereal::JSONInputArchive archive_in(is);
             serialize(archive_in);
         }
         return _vec_f;
     }
-    
-    std::vector<float> deserializeJsonFileToVector(const std::string & filename_string){
+
+    std::vector<float> deserializeJsonFileToVector(const std::string &filename_string)
+    {
         std::ifstream is(filename_string);
         {
             cereal::JSONInputArchive archive_in(is);
@@ -91,7 +98,8 @@ struct VectorFloatStruct4Cereal : public VectorFloatStruct {
         return _vec_f;
     }
 
-    std::vector<float> deserializeBinaryFileToVector(const std::string & filename_string){
+    std::vector<float> deserializeBinaryFileToVector(const std::string &filename_string)
+    {
         std::ifstream is(filename_string);
         {
             cereal::BinaryInputArchive archive_in(is);
@@ -100,7 +108,8 @@ struct VectorFloatStruct4Cereal : public VectorFloatStruct {
         return _vec_f;
     }
 
-    std::vector<float> deserializeBinaryStringToVector(const std::string & json_string){
+    std::vector<float> deserializeBinaryStringToVector(const std::string &json_string)
+    {
         std::stringstream ss(json_string);
         {
             cereal::BinaryInputArchive archive_in(ss);
@@ -108,8 +117,8 @@ struct VectorFloatStruct4Cereal : public VectorFloatStruct {
         }
         return _vec_f;
     }
-    
-    std::vector<float> deserializeBinaryStreamToVector(std::stringstream & is)
+
+    std::vector<float> deserializeBinaryStreamToVector(std::stringstream &is)
     {
         std::stringstream ss(is.str());
         {

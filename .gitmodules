@@ -16,3 +16,6 @@
 [submodule "thirdparties/yas"]
 	path = thirdparties/yas
 	url = https://github.com/niXman/yas.git
+[submodule "kpsr-build"]
+	path = kpsr-build
+	url = git@github.com:klepsydra-technologies/kpsr-build.git

@@ -1,0 +1,78 @@
+name: Check build
+
+on:
+  push:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - buildtype: Release
+          - buildtype: Debug
+
+    name: ${{ matrix.buildtype }} X64
+    runs-on: ubuntu-latest
+    container:
+      image: 337955887028.dkr.ecr.eu-central-1.amazonaws.com/general:kpe-build-1.2.1
+      options: --user root
+      credentials:
+        username: AWS
+        password: ${{ secrets.ECR_PASSWORD }}
+    steps:
+      - name: Clone kpsr-core
+        uses: actions/checkout@v2
+        with:
+          repository: klepsydra-technologies/kpsr-core
+          submodules: recursive
+          ref: main
+          path: kpsr-core
+
+      - name: Install kpsr-core
+        run: |
+          mkdir build && cd build 
+          cmake -DKPSR_WITH_DOXYGEN=true -DKPSR_WITH_DDS=false -DKPSR_WITH_ZMQ=false -DKPSR_TEST_PERFORMANCE=false -DKPSR_WITH_SOCKET=true -DKPSR_WITH_YAML=false -DKPSR_WITH_CODE_METRICS=true -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} ../
+          make -j$(nproc)
+          sudo make -j$(nproc) install
+        working-directory: kpsr-core
+
+      - name: Remove kpsr-core sources
+        run: |
+          sudo rm -rf ${GITHUB_WORKSPACE}/kpsr-core
+
+      - name: Clone kpsr-core-benchmarks
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Build
+        run: |
+          mkdir build && cd build 
+          cmake -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} -DBM_DENSE_RANGE_START=1024 -DBM_DENSE_RANGE_END=102400 -DBM_DENSE_RANGE_INCR=9216 ../
+          make -j$(nproc)
+
+      - name: Unit tests
+        timeout-minutes: 30
+        run: cd build && make test ARGS="--gtest_shuffle"
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.buildtype }}-x64-logs
+          path: |
+            build/CMakeFiles/CMakeOutput.log
+            build/CMakeFiles/CMakeError.log
+            build/Testing/Temporary
+            build/code_generator/kpsr_codegen/build_cpptesting/Testing/Temporary
+
+      - name: Workspace cleanup
+        if: always()
+        run: |
+          sudo rm -rf ${GITHUB_WORKSPACE}/build
