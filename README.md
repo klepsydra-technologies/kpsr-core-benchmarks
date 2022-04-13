@@ -3,6 +3,7 @@
 </p>
 
 [![Check build](https://github.com/klepsydra-technologies/kpsr-core-benchmarks/actions/workflows/push.yml/badge.svg?branch=main)](https://github.com/klepsydra-technologies/kpsr-core-benchmarks/actions/workflows/push.yml) [![Code style check](https://github.com/klepsydra-technologies/kpsr-core-benchmarks/actions/workflows/prcodecheck.yml/badge.svg?branch=main)](https://github.com/klepsydra-technologies/kpsr-core-benchmarks/actions/workflows/prcodecheck.yml) [![codecov](https://codecov.io/gh/klepsydra-technologies/kpsr-core-benchmarks/branch/main/graph/badge.svg?token=PDALQNPJRD)](https://codecov.io/gh/klepsydra-technologies/kpsr-core-benchmarks)
+
 # Installation Instructions
 
 ## System dependencies
@@ -72,7 +73,7 @@ The cmake has the following featured options:
 **out.txt** will be created in exection folder (/build if used to execute as example below **./bin/kpsr_benchmark_json_test**)
 * -DJSON_FILE_PATH_AND_NAME used to specify json output files created sequentialy by Cereal TCs when generate random std::vector< float > which will be used to generate the json files used as initial conditions of each benchamrk test. For each size of the vector benchmarked, will be generated a json initial file using this prefix and adding at the end the size number of the vector benchmarked.
 * -DBM_DENSE_RANGE_START benchmarks uses DenseRange for vectorSize from START to END with INCR. If _START not specified 1024 will be used.
-* -DBM_DENSE_RANGE_END benchmarks uses DenseRange for vectorSize from START to END with INCR. If _END not specified 102400 will be used. 
+* -DBM_DENSE_RANGE_END benchmarks uses DenseRange for vectorSize from START to END with INCR. If _END not specified 102400 will be used.
 * -DBM_DENSE_RANGE_INCR benchmarks uses DenseRange for vectorSize from START to END with INCR. If _INCR not specified 1024 will be used.  
 
 Example
@@ -157,7 +158,7 @@ As is shown, ***my_cereal_json_str.txt*****1024** file is the concatenation of t
 
 **NOTE**: If DJSON_FILE_PATH_AND_NAME is not specified, default **cereal_json_str.txt** filename will be used.
 
-**NOTE**: bytes_per_second Counter is calculated as in google benchmark examples but for float size. See below. For binary serialization has not been considered the real serialized size stream. Has been considered the total bytes in floats into the std::vector< float > array to calulate the bytes processed. Its a messure of our real worth processed and not the real binary stream processed. 
+**NOTE**: bytes_per_second Counter is calculated as in google benchmark examples but for float size. See below. For binary serialization has not been considered the real serialized size stream. Has been considered the total bytes in floats into the std::vector< float > array to calulate the bytes processed. Its a messure of our real worth processed and not the real binary stream processed.
 
 ```bash
 state.SetBytesProcessed(int64_t(state.iterations()) * int64_t(retrievedVectorSize * sizeof(float)));

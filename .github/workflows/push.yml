@@ -20,7 +20,7 @@ jobs:
     name: ${{ matrix.buildtype }} X64
     runs-on: ubuntu-latest
     container:
-      image: 337955887028.dkr.ecr.eu-central-1.amazonaws.com/general:kpe-build-1.2.1
+      image: 337955887028.dkr.ecr.eu-central-1.amazonaws.com/general:kpe-build-1.3.0
       options: --user root
       credentials:
         username: AWS
@@ -57,7 +57,7 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=${{ matrix.buildtype }} -DBM_DENSE_RANGE_START=1024 -DBM_DENSE_RANGE_END=102400 -DBM_DENSE_RANGE_INCR=9216 ../
           make -j$(nproc)
 
-      - name: Unit tests
+      - name: Run tests
         timeout-minutes: 30
         run: cd build && make test ARGS="--gtest_shuffle"
 
