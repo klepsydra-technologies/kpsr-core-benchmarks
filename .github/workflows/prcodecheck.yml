@@ -17,7 +17,7 @@ jobs:
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     container:
-      image: 337955887028.dkr.ecr.eu-central-1.amazonaws.com/general:kpe-build-1.2.1
+      image: 337955887028.dkr.ecr.eu-central-1.amazonaws.com/general:kpe-build-1.3.0
       options: --user root
       credentials:
         username: AWS
@@ -51,7 +51,7 @@ jobs:
       - name: Code format check
         run: |
           mkdir build && cd build
-          cmake -DKPSR_NO_LICENSE=true ../
+          cmake ../
           make formatcheck
 
       - name: Workspace cleanup
@@ -63,7 +63,7 @@ jobs:
     name: Code coverage
     runs-on: ubuntu-latest
     container:
-      image: 337955887028.dkr.ecr.eu-central-1.amazonaws.com/general:kpe-build-1.2.1
+      image: 337955887028.dkr.ecr.eu-central-1.amazonaws.com/general:kpe-build-1.3.0
       options: --user root
       credentials:
         username: AWS
@@ -95,12 +95,16 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Build
-        timeout-minutes: 30
+      - name: Build project
         run: |
           mkdir build && cd build 
           cmake -DKPSR_WITH_CODE_METRICS=true -DCMAKE_BUILD_TYPE=Debug -DBM_DENSE_RANGE_START=1024 -DBM_DENSE_RANGE_END=2048 -DBM_DENSE_RANGE_INCR=1024 ../
           make -j$(nproc)
+
+      - name: Code coverage
+        timeout-minutes: 10
+        run: |
+          cd build
           make -j$(nproc) coverage
 
       - uses: codecov/codecov-action@v2
